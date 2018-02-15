@@ -36,4 +36,4 @@ deploy:
   provider: heroku
   app: repogit
   api_key:
-    secure: "YOUR ENCRYPTED API KEY"
+    secure: cc7b16a5-3285-4053-90da-0e36a82f1b52
