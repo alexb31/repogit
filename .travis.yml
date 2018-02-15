@@ -1,37 +1,33 @@
 sudo: false
 
+language: php
+
+php: 7.2
+
 # cache composer downloads so installing is quicker
 cache:
   yarn: true
   directories:
     - $HOME/.composer/cache
 
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+    
 stages:
   - style
   - test
   - asset
 
 jobs:
-  include:
     - stage: Style
 
       language: php
 
-      php: 7.0
+      php: 7.2
 
       install:
         - composer install
-        
-    - stage: Style
-
-      language: php
-
-      php: 7.1
-
-      install:
-        - composer install
-
-notifications:
-  email:
-    on_success: change
-    on_failure: always
+        - php security-checker.phar security:check composer.lock
+        - php php-cs-fixer-v2.phar fix . --rules=@Symfony
