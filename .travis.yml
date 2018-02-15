@@ -31,3 +31,9 @@ jobs:
         - composer install
         - php security-checker.phar security:check composer.lock
         - php php-cs-fixer-v2.phar fix . --rules=@Symfony
+
+deploy:
+  provider: heroku
+  app: repogit
+  api_key:
+    secure: cc7b16a5-3285-4053-90da-0e36a82f1b52
