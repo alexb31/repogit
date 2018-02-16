@@ -45,7 +45,7 @@ jobs:
     
 
 after_success:
-deploy:
+-deploy:
   provider: heroku
   app: repogit
   api_key:
