@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/alexb31/repogit.svg?branch=master)](https://travis-ci.org/alexb31/repogit)
+
 Symfony Standard Edition
 ========================
 
