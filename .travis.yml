@@ -1,26 +1,50 @@
-sudo: false
 language: php
-php: 7.2
-cache:
-  yarn: true
-  directories:
-  - "$HOME/.composer/cache"
+
+php: 7.1
+
 notifications:
   email:
-    on_success: change
+    on_success: never
     on_failure: always
+
 stages:
-- style
-- test
-- asset
+  - install
+  - test
+
 jobs:
-- stage: Style
-  language: php
-  php: 7.2
-  install:
-  - composer install
-  - php security-checker.phar security:check composer.lock
-  - php php-cs-fixer-v2.phar fix . --rules=@Symfony
+  include:
+    - stage: install
+
+      language: php
+
+      php: 7.0
+
+      before_script:
+        - composer install
+        - phpenv config-rm xdebug.ini
+        - composer validate --no-check-publish
+
+      script:
+        - php php-cs-fixer-v2.phar fix . --rules=@Symfony
+        - docker run --rm -v $PWD:/app phpqa/security-checker security:check
+        - phpunit
+    
+
+    - stage: test
+
+      language: php
+
+      php: 7.1
+
+      before_script:
+        - composer install
+        - composer validate --no-check-publish
+
+      script:
+        - php php-cs-fixer-v2.phar fix . --rules=@Symfony
+        - docker run --rm -v $PWD:/app phpqa/security-checker security:check
+        - phpunit
+
 deploy:
   provider: heroku
   app: repogit
