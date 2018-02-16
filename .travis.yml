@@ -1,39 +1,52 @@
-sudo: false
-
 language: php
 
-php: 7.2
-
-# cache composer downloads so installing is quicker
-cache:
-  yarn: true
-  directories:
-    - $HOME/.composer/cache
+php: 7.1
 
 notifications:
   email:
-    on_success: change
+    on_success: never
     on_failure: always
-    
+
 stages:
-  - style
+  - install
   - test
-  - asset
 
 jobs:
-    - stage: Style
+  include:
+    - stage: install
 
       language: php
 
-      php: 7.2
+      php: 7.0
 
-      install:
+      before_script:
         - composer install
-        - php security-checker.phar security:check composer.lock
+        - phpenv config-rm xdebug.ini
+        - composer validate --no-check-publish
+
+      script:
         - php php-cs-fixer-v2.phar fix . --rules=@Symfony
+        - docker run --rm -v $PWD:/app phpqa/security-checker security:check
+        - phpunit
+    
+
+    - stage: test
+
+      language: php
+
+      php: 7.1
+
+      before_script:
+        - composer install
+        - composer validate --no-check-publish
+
+      script:
+        - php php-cs-fixer-v2.phar fix . --rules=@Symfony
+        - docker run --rm -v $PWD:/app phpqa/security-checker security:check
+        - phpunit
 
 deploy:
   provider: heroku
   app: repogit
   api_key:
-    secure: cc7b16a5-3285-4053-90da-0e36a82f1b52
+    secure: h9RsW9ea+efFHqW2zlCyz8O8u4aei+kriTmfSUl56aoP+XYYs0dly+0o3JJYX1B78/JoinCMEaqNBjyNjbz6f1LY3F+ZibVMx9b7m2t/nlrGBs4yDgl+QbOYIemoHRCgoU+4AqJK2lLI3ekdcZqHROd6UqzvR3K/YszncjE26v//SgqiA2J2WGRuv3b5uvcnaC0bd8dMjpBVasyoKgmuURs/r9WZIylh/EKgo5kn9uRL9b17avs1WwC/AHiaD164YKFmbb/mpaa0hQDYjiy+q62z++xsRhP9VL6mynms3EYKwKPzOxEWQpisgUcyL9+rHTvcenmLIVRePu5dt6nNYgHFBGx4yggx2AELQL7ohDafqbKPTR1q/VvTfZlVsMsQG264mmk0TCe1giPaTefr8wlU+7n6UViv9StZv1EEsE5R8gxgopvQ1drHZArjiimZ6b2mm+SsjF1yLeFy+Zd8qRxEUm3XQwmmHhJfqOMo3gSmTSu6d4DbNCYyDopgRzBW84QfSEC4eS/ufsNe/bFEXnKJNaydjbV5OhJMjznBQl79CJEULP+HIkcbsd5z0zsQwpjRljsVQb0Ked0m7fuJa97PL5NDbt90bQpCvWNOr0ChBGXL0pqzb0u+XC/JVV+6VcPgF/2RTTozPRHsDTbAg2Lz5IYZnehpi9nhPXZQr8g=
